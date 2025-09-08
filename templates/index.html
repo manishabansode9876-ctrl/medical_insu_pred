@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Insurance Prediction</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-image: url("{{ url_for('static', filename='images/medical-insurance-image.webp') }}");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+        form {
+            background-color: rgba(14, 5, 5, 0.8);  /* Transparent white background for form */
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            margin: auto;
+        }
+        label, select, input {
+            display: block;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        button {
+            background-color: #28a745;
+            color: #fff;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            border-radius: 4px;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+
+<header style="text-align:center; padding:20px 0; background:#0074D9; color:#fff; border-radius:8px; margin-bottom:30px;">
+    <h1 style="margin:0; font-size:2.5em;">Medical Insurance Charge Prediction</h1>
+    <p style="margin:0; font-size:1.2em;">Powered by AI | Professional Edition</p>
+</header>
+
+<div style="max-width:500px; margin:auto;">
+    <div style="background:rgba(255,255,255,0.95); border-radius:12px; box-shadow:0 2px 16px rgba(0,0,0,0.08); padding:32px 24px;">
+        <form id="insurance-form" method="POST">
+            <label for="age">Age:
+                <span title="Enter your age (18-100)" style="color:#888; font-size:0.9em;">&#9432;</span>
+            </label>
+            <input type="number" id="age" name="age" min="18" max="100" required placeholder="e.g. 30">
+
+            <label for="gender">Gender:
+                <span title="Select your gender" style="color:#888; font-size:0.9em;">&#9432;</span>
+            </label>
+            <select id="gender" name="gender" required>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+            </select>
+
+            <label for="bmi">BMI:
+                <span title="Body Mass Index (10-50)" style="color:#888; font-size:0.9em;">&#9432;</span>
+            </label>
+            <input type="number" id="bmi" name="bmi" step="0.1" min="10" max="50" required placeholder="e.g. 22.5">
+
+            <label for="children">Number of Children:
+                <span title="How many children do you have? (0-10)" style="color:#888; font-size:0.9em;">&#9432;</span>
+            </label>
+            <input type="number" id="children" name="children" min="0" max="10" required placeholder="e.g. 2">
+
+            <label for="smoker">Smoker:
+                <span title="Are you a smoker?" style="color:#888; font-size:0.9em;">&#9432;</span>
+            </label>
+            <select id="smoker" name="smoker" required>
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+            </select>
+
+            <label for="region">Region:
+                <span title="Select your region" style="color:#888; font-size:0.9em;">&#9432;</span>
+            </label>
+            <select id="region" name="region" required>
+                <option value="southeast">Southeast</option>
+                <option value="southwest">Southwest</option>
+                <option value="northeast">Northeast</option>
+                <option value="northwest">Northwest</option>
+            </select>
+
+            <button type="submit" id="predict-btn" style="background:#0074D9; color:#fff; padding:12px; border:none; border-radius:6px; font-size:1.1em; font-weight:bold; margin-top:10px; transition:background 0.2s;">Predict</button>
+            <div id="loading-spinner" style="display:none; text-align:center; margin-top:10px;">
+                <span style="font-size:1.5em; color:#0074D9;">⏳ Predicting...</span>
+            </div>
+        </form>
+        <div id="message-area" style="margin-top:18px; text-align:center;"></div>
+        <div id="result-card" style="display:none; margin-top:18px; background:#eaf6fb; border-radius:8px; padding:18px; box-shadow:0 1px 8px rgba(0,116,217,0.08);">
+            <h2 style="margin:0; color:#0074D9;">Predicted Medical Insurance Charges:</h2>
+            <span id="predicted-value" style="font-size:2em; font-weight:bold;"></span>
+        </div>
+    </div>
+</div>
+
+<footer style="text-align:center; margin-top:40px; color:#888; font-size:1em;">
+    &copy; 2025 Medical Insurance Predictor | All rights reserved
+</footer>
+
+<script>
+    const form = document.getElementById('insurance-form');
+    const btn = document.getElementById('predict-btn');
+    const spinner = document.getElementById('loading-spinner');
+    const resultCard = document.getElementById('result-card');
+    const predictedValue = document.getElementById('predicted-value');
+    const messageArea = document.getElementById('message-area');
+
+    form.addEventListener('submit', async function (event) {
+        event.preventDefault();
+        btn.disabled = true;
+        spinner.style.display = 'block';
+        resultCard.style.display = 'none';
+        messageArea.textContent = '';
+        const formData = new FormData(event.target);
+        try {
+            const response = await fetch('/predict', {
+                method: 'POST',
+                body: formData
+            });
+            const result = await response.json();
+            spinner.style.display = 'none';
+            btn.disabled = false;
+            if (result.status === 'success') {
+                predictedValue.textContent = `₹ ${result.prediction.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+                resultCard.style.display = 'block';
+                messageArea.innerHTML = `<span style='color:green;'>${result.message}</span>`;
+            } else {
+                resultCard.style.display = 'none';
+                messageArea.innerHTML = `<span style='color:red;'>${result.error || 'Prediction failed.'}</span>`;
+            }
+        } catch (err) {
+            spinner.style.display = 'none';
+            btn.disabled = false;
+            resultCard.style.display = 'none';
+            messageArea.innerHTML = `<span style='color:red;'>Server error. Please try again later.</span>`;
+        }
+    });
+</script>
+
+</body>
+</html>
