@@ -103,7 +103,7 @@ The API returns appropriate error messages for:
 # 🚀 My Flask + ML Projects  
 
 ## 🔗 Projects Portfolio
-1. [Medical Insurance Prediction](https://github.com/manishabansode9876/medical_insu_pred)
+1. [Medical Insurance Prediction](https://github.com/manishabansode9876-ctrl/medical_insu_pred)
    
 
 ## Contributing
