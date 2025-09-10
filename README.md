@@ -100,6 +100,11 @@ The API returns appropriate error messages for:
 - Invalid input values
 - Model loading errors
 - Prediction errors
+# 🚀 My Flask + ML Projects  
+
+## 🔗 Projects Portfolio
+1. [Medical Insurance Prediction](https://github.com/manishabansode9876/medical_insu_pred)
+   
 
 ## Contributing
 
